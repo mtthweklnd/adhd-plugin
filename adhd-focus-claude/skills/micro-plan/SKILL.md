@@ -77,9 +77,7 @@ Use this format when generating or updating `_dev/<id>-<slug>.md`:
 
 - [ ] 1. <Ultra-low friction warm-up step - 5 minutes>
 - [ ] 2. <Core implementation step>
-  <!-- Discovered intermediate tasks go here inline:
-  - [ ] [Discovered] <Sub-step found during work>
-  -->
+  - [ ] [Discovered] <Slot intermediate sub-steps found during work directly here>
 - [ ] 3. <Verification and test step>
 
 ## Roadmap

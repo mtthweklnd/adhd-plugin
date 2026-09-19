@@ -8,11 +8,10 @@
 ## Session Briefing
 
 At the start of every session, after reading the injected briefing:
-- Always produce the 3-point summary using these exact section markers:
+- Always produce the 3-point summary leading with the single recommended next action:
+  - `[Next Action]` - The single recommended next action to resume flow (put this first).
   - `[Completed]` - What was just completed (from git log).
   - `[In Progress]` - What is currently in-progress or unfinished (from git status + _dev/ tasks).
-  - `[Next Action]` - The single recommended next action to resume flow.
-- Lead with the single recommended next action - put it first, not last.
 - Keep the summary to bullet points. Do not pad it with context the user didn't ask for.
 
 ## Single Living Document Pattern

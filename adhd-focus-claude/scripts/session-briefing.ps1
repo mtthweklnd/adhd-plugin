@@ -39,11 +39,11 @@ $gitSection = ""
 $workItemId = $null
 
 try {
-    $isGitRepo = & git -C $workspaceRoot rev-parse --is-inside-work-tree 2>&1
+    $null = & git -C "$workspaceRoot" rev-parse --is-inside-work-tree 2>&1
     if ($LASTEXITCODE -eq 0) {
-        $branch    = (& git -C $workspaceRoot branch --show-current 2>&1).Trim()
-        $status    = & git -C $workspaceRoot status --short 2>&1
-        $recentLog = & git -C $workspaceRoot log --oneline -5 2>&1
+        $branch    = (& git -C "$workspaceRoot" branch --show-current 2>&1).Trim()
+        $status    = & git -C "$workspaceRoot" status --short 2>&1
+        $recentLog = & git -C "$workspaceRoot" log --oneline -5 2>&1
 
         $statusText = if ($status) { ($status | Out-String).Trim() } else { "(clean - no uncommitted changes)" }
         $logText    = if ($recentLog) { ($recentLog | Out-String).Trim() } else { "(no commits yet)" }
@@ -119,10 +119,10 @@ You are starting a new session. Before doing anything else, do the following:
 
 1. Read the git log and uncommitted changes below to understand what was last worked on.
 2. Read the most recently modified file(s) in ``_dev/`` to identify the current phase and any open tasks.
-3. Produce a **3-point summary** to the user:
+3. Produce a **3-point summary** to the user (lead with the next action):
+   - [Next Action] The single recommended next action to resume flow (be specific - name the file, function, or task)$adoCommitReminder
    - [Completed] What was just completed (from git log)
    - [In Progress] What is currently in-progress or unfinished (from git status + _dev/ tasks)
-   - [Next Action] The single recommended next action to resume flow (be specific - name the file, function, or task)$adoCommitReminder
 
 Keep the summary concise. Use bullet points. Lead with the next action.
 
