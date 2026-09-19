@@ -40,3 +40,11 @@ At the start of every session, after reading the injected briefing:
 - When introducing a new concept or variable mid-task, define it in one sentence before using it.
 - Avoid nested parenthetical explanations mid-sentence. Break them into separate sentences.
 - If a code block exceeds 30 lines, summarize what it does in a comment at the top.
+
+## Code Complexity & AST Hygiene
+
+- Avoid custom call chains deeper than 2 hops (`A() -> B() -> C()`) unless writing recursive algorithms.
+- Inline intermediate passthrough functions that only exist to pass arguments down another hop.
+- Structure multi-step workflows as flat sequential pipelines where the coordinator invokes steps linearly with named intermediate variables, rather than having Step 1 delegate internally to Step 2.
+- Cap indentation depth to 2 levels using guard clauses and early returns over nested conditionals.
+- When explaining or presenting complex logic, provide a 2-3 bullet plain-English summary of inputs, transformations, and outputs before outputting the code block.

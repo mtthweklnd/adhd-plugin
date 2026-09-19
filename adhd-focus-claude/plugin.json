@@ -1,5 +1,5 @@
 {
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "adhd-focus",
-  "description": "Session-start briefing and focus-support tooling for ADHD-style working patterns: a git/task recap injected at the start of a session, standing task-discipline rules, and an unblock skill for task paralysis."
+  "description": "Session-start briefing and focus-support tooling for ADHD-style working patterns: git/task session recap, standing task-discipline and AST hygiene rules, and skills for unblocking, living task plans, code simplification, and workflow tracing."
 }

@@ -12,9 +12,11 @@ named for clarity when both variants coexist in the same repo.
 | Component | Path | Purpose |
 |---|---|---|
 | Hook | `hooks.json` / `scripts/session-briefing.ps1` (PowerShell) / `scripts/session-briefing.sh` (POSIX sh) | On the first model invocation of a session (`PreInvocation`, `invocationNum == 0`), reads git log, branch, uncommitted status, and active tasks under `_dev/`. Detects Azure DevOps work items from the branch, reminds the agent to format commits (`AB#<id>:`), and injects a briefing requiring a 3-point summary (`[Next Action]`, `[Completed]`, `[In Progress]`). |
-| Rules | `rules/AGENTS.md` | Standing constraints: zero-emoji mandate, reinforces the 3-point summary format, enforces the single living document pattern with in-line `[Discovered]` tasks, establishes Azure DevOps commit hygiene (`AB#<id>:`), and sets working-memory hygiene rules. |
+| Rules | `rules/AGENTS.md` | Standing constraints: zero-emoji mandate, reinforces the 3-point summary format, enforces the single living document pattern with in-line `[Discovered]` tasks, establishes Azure DevOps commit hygiene (`AB#<id>:`), and sets working-memory and AST hygiene rules. |
 | Skill | `skills/unblock/SKILL.md` | Triggers when the user is stuck or doesn't know where to start. Diagnoses the specific blocker, carves out a single 15-minute micro-task with a concrete first step, and states clear completion conditions. |
 | Skill | `skills/micro-plan/SKILL.md` | Scaffolds and manages ADHD-friendly living task documents in `_dev/<id>-<slug>.md` with a 5-minute warm-up entry point, linear Task List, Acceptance Criteria, and a Roadmap section for deferred scope. |
+| Skill | `skills/simplify/SKILL.md` | Simplifies complex code and eliminates nested control flow (guard clauses, decomposing long functions, domain naming) while strictly preserving behavior. |
+| Skill | `skills/trace-workflow/SKILL.md` | Maps multi-tier call hierarchies (A -> B -> C -> D) onto a single plane, visualizes data transformation timelines, and refactors deep delegation into linear orchestrators. |
 
 ## Requirements
 
@@ -69,6 +71,14 @@ The plugin organizes work into single living documents located in `_dev/` (e.g. 
   - **Acceptance Criteria**: Verifiable requirements defining when the work item is complete.
   - **Task List**: Linear, numbered execution steps with a 5-minute warm-up entry point.
   - **Roadmap**: Captures out-of-scope ideas and future enhancements so current focus remains protected.
+
+## Code Complexity & Workflow Tracing
+ 
+- **AST Hygiene**: Caps indentation depth to 2 levels using guard clauses and early returns. Requires pre-code summaries for complex logic blocks.
+- **Linear Orchestration**: Avoids custom call chains deeper than 2 hops (`A() -> B() -> C()`), inlines single-use passthrough wrappers, and promotes flat pipelines over nested delegation.
+- **On-Demand Skills**:
+  - `simplify`: Reduces cognitive load and dense nesting without changing behavior or contracts.
+  - `trace-workflow`: Maps deep call trees into single-plane diagrams and flattens delegation hierarchies into linear workflows.
 
 ## Roadmap
 
