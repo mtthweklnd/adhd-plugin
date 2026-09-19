@@ -24,8 +24,8 @@ Break task paralysis by shrinking the horizon to a single, verifiable 15-minute 
    - The task feels too large to have a clear entry point
 
 2. **Carve a micro-task.** State one thing — and only one thing — the user should do in the next 15 minutes. Be hyper-specific:
-   - ✅ "Define only the TypeScript interface for the API response in `src/types/reports.ts`. Do not write any logic yet."
-   - ❌ "Start working on the feature"
+   - [DO] "Define only the TypeScript interface for the API response in `src/types/reports.ts`. Do not write any logic yet."
+   - [DON'T] "Start working on the feature"
 
 3. **Scaffold a stub.** Create or propose a minimal stub (a failing test, an empty function signature, a schema placeholder) so there is an immediate, runnable sandbox. The stub should be small enough to exist in under 5 minutes.
 
