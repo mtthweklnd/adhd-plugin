@@ -1,0 +1,11 @@
+{
+  "session-briefing": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -NonInteractive -File scripts/session-briefing.ps1",
+        "timeout": 15
+      }
+    ]
+  }
+}
