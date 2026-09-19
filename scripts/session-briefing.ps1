@@ -1,40 +1,54 @@
 # session-briefing.ps1
-# Fires on PreInvocation. Only runs on the first invocation (session start).
-# Reads git state and _dev/ task files, then injects a structured briefing
-# into the agent's context so you always know exactly where to pick up.
+# Polyglot hook script for Google Antigravity (AGY) and Claude Code (CC).
+#
+# AGY  — fires on PreInvocation; stdin JSON has invocationNum + workspacePaths.
+#         Emits { injectSteps: [ { ephemeralMessage: <text> } ] }.
+# CC   — fires on SessionStart; stdin JSON has hook_event_name + cwd.
+#         Emits plain stdout text (markdown).
+# Fallback (no recognizable keys / empty stdin) — treats as CC, emits plain stdout.
 
+# 1. READ STDIN
 $input_json = $null
 try {
     $raw = [Console]::In.ReadToEnd()
-    if ($raw) {
+    if ($raw -and $raw.Trim()) {
         $input_json = $raw | ConvertFrom-Json
     }
 } catch {
-    # If we can't parse stdin, bail silently (output empty object)
-    Write-Output '{}'
-    exit 0
+    # Unparseable stdin — fall through to CC/fallback path
 }
 
-# Only fire on the very first invocation of a session
-$invocationNum = $input_json.invocationNum
-if ($null -ne $invocationNum -and $invocationNum -gt 0) {
-    Write-Output '{}'
-    exit 0
+# 2. PLATFORM DETECTION
+$isAGY = $false
+if ($input_json -and (
+    $null -ne $input_json.PSObject.Properties['invocationNum'] -or
+    $null -ne $input_json.PSObject.Properties['workspacePaths']
+)) {
+    $isAGY = $true
+}
+# CC path: hook_event_name / cwd present, or no recognizable keys
+
+# 3. AGY: SKIP FOLLOW-UP TURNS
+if ($isAGY) {
+    $invocationNum = $input_json.invocationNum
+    if ($null -ne $invocationNum -and $invocationNum -gt 0) {
+        Write-Output '{}'
+        exit 0
+    }
 }
 
-# Resolve workspace root (first path in workspacePaths)
-$workspacePaths = $input_json.workspacePaths
+# 4. RESOLVE WORKSPACE ROOT
 $workspaceRoot = $null
-if ($workspacePaths -and $workspacePaths.Count -gt 0) {
-    $workspaceRoot = $workspacePaths[0]
+if ($isAGY -and $input_json.workspacePaths -and $input_json.workspacePaths.Count -gt 0) {
+    $workspaceRoot = $input_json.workspacePaths[0]
+} elseif ($input_json -and $null -ne $input_json.PSObject.Properties['cwd'] -and $input_json.cwd) {
+    $workspaceRoot = $input_json.cwd
 }
-
 if (-not $workspaceRoot -or -not (Test-Path $workspaceRoot)) {
-    Write-Output '{}'
-    exit 0
+    $workspaceRoot = $PWD.Path
 }
 
-# 1. GIT STATUS & WORK ITEM DETECTION
+# 5. GIT STATE & WORK ITEM DETECTION
 $gitSection = ""
 $workItemId = $null
 
@@ -48,9 +62,8 @@ try {
         $statusText = if ($status) { ($status | Out-String).Trim() } else { "(clean - no uncommitted changes)" }
         $logText    = if ($recentLog) { ($recentLog | Out-String).Trim() } else { "(no commits yet)" }
 
-        # Detect work item ID from branch name (e.g. 10425, 10425-feature, feature/10425-feature)
         if ($branch -match '(?:^|[/_-])(\d{3,8})(?:[/_-]|$)') {
-            $workItemId = $matches[1]
+            $workItemId = $Matches[1]
         }
 
         $adoHeader = if ($workItemId) { "`n**Azure DevOps Work Item:** AB#$workItemId" } else { "" }
@@ -69,15 +82,14 @@ $statusText
     $gitSection = "## Git`n(could not read git state)"
 }
 
-# 2. _dev/ TASK FILES
+# 6. _dev/ TASK FILES
 $devSection = ""
 $devPath = Join-Path $workspaceRoot "_dev"
 
 if (Test-Path $devPath) {
-    $allDevFiles = Get-ChildItem -Path $devPath -Recurse -Include "*.md","*.txt","*.yaml","*.yml"
+    $allDevFiles = Get-ChildItem -Path $devPath -Recurse -Include "*.md","*.txt","*.yaml","*.yml" -ErrorAction SilentlyContinue
 
-    if ($allDevFiles.Count -gt 0) {
-        # Prioritize work item files if work item ID was detected
+    if ($allDevFiles -and $allDevFiles.Count -gt 0) {
         $sortedFiles = if ($workItemId) {
             $matching = $allDevFiles | Where-Object { $_.Name -match "\b$workItemId\b" } | Sort-Object LastWriteTime -Descending
             $others   = $allDevFiles | Where-Object { $_.Name -notmatch "\b$workItemId\b" } | Sort-Object LastWriteTime -Descending
@@ -104,9 +116,27 @@ $($fileList -join "`n")
     $devSection = "## _dev/`n(no ``_dev/`` folder found in workspace root)"
 }
 
-# 3. ASSEMBLE BRIEFING
+# 7. STANDING RULES (from rules/AGENTS.md, routed through stdout for both platforms)
+$rulesSection = ""
+$scriptDir = $PSScriptRoot
+if (-not $scriptDir) {
+    try { $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path } catch {}
+}
+if ($scriptDir) {
+    $agentsPath = Join-Path (Split-Path -Parent $scriptDir) "rules" "AGENTS.md"
+    if (Test-Path $agentsPath) {
+        $rulesContent = (Get-Content $agentsPath -Raw).Trim()
+        $rulesSection = @"
+
+--- Standing Rules ---
+$rulesContent
+"@
+    }
+}
+
+# 8. ASSEMBLE BRIEFING
 $adoCommitReminder = if ($workItemId) {
-    "`n- Prepend ``AB#${workItemId}:`` to all git commit messages for this work item."
+    "`n   - Prepend ``AB#${workItemId}:`` to all git commit messages for this work item."
 } else {
     ""
 }
@@ -115,12 +145,12 @@ $briefing = @"
 ---
 # Session Briefing
 
-You are starting a new session. Before doing anything else, do the following:
+You are starting a new session. Before doing anything else:
 
 1. Read the git log and uncommitted changes below to understand what was last worked on.
-2. Read the most recently modified file(s) in ``_dev/`` to identify the current phase and any open tasks.
+2. Read the most recently modified file(s) in ``_dev/`` to identify the current phase and open tasks.
 3. Produce a **3-point summary** to the user (lead with the next action):
-   - [Next Action] The single recommended next action to resume flow (be specific - name the file, function, or task)$adoCommitReminder
+   - [Next Action] The single recommended next action to resume flow (name the file, function, or task)$adoCommitReminder
    - [Completed] What was just completed (from git log)
    - [In Progress] What is currently in-progress or unfinished (from git status + _dev/ tasks)
 
@@ -129,16 +159,18 @@ Keep the summary concise. Use bullet points. Lead with the next action.
 $gitSection
 
 $devSection
+$rulesSection
 ---
 "@
 
-# 4. OUTPUT
-$output = @{
-    injectSteps = @(
-        @{
-            ephemeralMessage = $briefing
-        }
-    )
+# 9. EMIT OUTPUT
+if ($isAGY) {
+    $output = @{
+        injectSteps = @(
+            @{ ephemeralMessage = $briefing }
+        )
+    }
+    $output | ConvertTo-Json -Depth 5 -Compress
+} else {
+    Write-Output $briefing
 }
-
-$output | ConvertTo-Json -Depth 5 -Compress
