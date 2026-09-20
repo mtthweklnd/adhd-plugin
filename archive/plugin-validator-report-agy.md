@@ -1,3 +1,5 @@
+> **Archived — superseded.** Pre-consolidation critique of `consolidation_proposal_plan.md`. Its "CRITICAL" layout issue was resolved in the shipped consolidation (commit `1658b4b`); the repo now matches its "Recommended AGY Install Layout" section. Kept for history only.
+
 # AGY Plugin Validation Report
 
 Cross-checked against the official Antigravity Customization System documentation (hooks.md, plugins.md, skills.md, rules.md).
