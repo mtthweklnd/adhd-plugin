@@ -1,3 +1,5 @@
+> **Archived — superseded.** This plan shipped in commit `1658b4b` ("unify dual-platform plugin and add simplify & trace-workflow skills"). The `adhd-focus-agy` / `adhd-focus-claude` subfolders it describes no longer exist; the repo root is the unified layout. Kept for history only.
+
 # Implementation Plan: Unify Antigravity and Claude Code Plugins into a Single Dual-Target Plugin
 
 Combine `adhd-focus-agy` and `adhd-focus-claude` into a single, unified plugin package (`adhd-focus`) that works out-of-the-box on both **Google Antigravity** and **Claude Code** without duplicating skills, rules, or briefing logic.

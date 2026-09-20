@@ -1,10 +1,11 @@
 ---
 name: simplify
 description: >-
-  Understand and simplify complex code to reduce cognitive load and eliminate
-  dense branch nesting while strictly preserving behavior. Triggers on:
-  "simplify this", "explain this code", "make this cleaner", "reduce cognitive load",
-  "this code is overwhelming".
+  Simplify or explain a single function or block: de-densify dense branch nesting
+  and reduce working memory overhead while strictly preserving behavior. For a
+  cross-function or multi-file delegation chain, use trace-workflow instead.
+  Triggers on: "simplify this", "explain this code", "make this cleaner",
+  "reduce cognitive load", "this code is overwhelming".
 ---
 
 # Simplify
@@ -12,10 +13,6 @@ description: >-
 ## Purpose
 
 De-densify complex logic and eliminate nested control flow to minimize working memory overhead, without altering runtime behavior or external API contracts.
-
-## Triggers
-
-- Trigger phrases: "simplify this", "explain this code", "make this cleaner", "reduce cognitive load", "this code is overwhelming", "clean up this function"
 
 ## Workflow Steps
 
@@ -25,16 +22,16 @@ De-densify complex logic and eliminate nested control flow to minimize working m
    - **Core Transformation:** The primary business logic or computation performed.
    - **Output / Side Effects:** What is returned, modified in external state, or emitted.
 
+   If the request was explanation-only ("explain this code") with no ask to change it, stop here — do not propose a refactor.
+
 2. **Cognitive Audit:**
-   Analyze the target code for working memory friction:
-   - Nesting depth exceeding 2 levels (nested `if`/`else`, nested callbacks, deep loops).
+   Beyond the AST Hygiene standard in `rules/AGENTS.md` (2-level nesting cap, guard clauses), check for working memory friction the standard doesn't cover:
    - Dense or chained ternary expressions.
    - Cryptic single-letter or abbreviated variable names.
    - Mixed responsibilities (e.g., validation, business calculation, and response formatting intertwined in one block).
 
 3. **Behavior-Preserving Refactor:**
-   Apply AST and control-flow hygiene while strictly preserving existing behavior:
-   - **Guard Clauses & Early Returns:** Invert conditions to exit early on edge cases and error states, flattening the happy path to base indentation.
+   Apply the AST Hygiene standard from `rules/AGENTS.md`, plus:
    - **Extract Helper Units:** Break blocks exceeding 30 lines or containing separate concerns into dedicated single-purpose functions with explicit input/output parameters.
    - **Domain Naming:** Replace cryptic identifiers with descriptive domain nouns and verbs.
    - **Unpack Dense Expressions:** Expand compound ternaries into explicit conditional branches or lookup dictionaries/maps.
@@ -46,7 +43,6 @@ De-densify complex logic and eliminate nested control flow to minimize working m
 
 ## Rules
 
-- Strictly no emojis in summaries, explanations, or code comments.
 - Never change observable behavior, function signatures, or return contracts unless explicitly requested.
 - Keep refactoring local and incremental; avoid introducing unrequested architectural abstractions.
 - Never output raw refactored code without the initial 3-bullet comprehension summary.

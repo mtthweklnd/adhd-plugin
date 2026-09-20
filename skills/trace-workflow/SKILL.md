@@ -1,11 +1,11 @@
 ---
 name: trace-workflow
 description: >-
-  Trace and flatten nested custom function workflows and multi-tier delegation chains
-  (A -> B -> C -> D) to prevent mental stack overflow. Maps call hierarchies onto
-  a single plane and refactors deep delegation into linear orchestrators. Triggers on:
-  "trace this workflow", "trace the call tree", "flatten this call chain",
-  "too many function hops", "untangle nested functions", "map the workflow", "trace this function".
+  Trace or flatten a delegation chain across multiple custom functions or files
+  (A -> B -> C -> D) to prevent mental stack overflow. For nesting inside a single
+  function, use simplify instead. Triggers on: "trace this workflow", "trace the
+  call tree", "flatten this call chain", "too many function hops", "untangle
+  nested functions", "map the workflow", "trace this function".
 ---
 
 # Trace Workflow
@@ -13,10 +13,6 @@ description: >-
 ## Purpose
 
 Prevent mental stack overflow caused by deep function delegation (A -> B -> C -> D). Maps multi-tier call hierarchies onto a single visual plane and provides a structured approach for flattening nested delegation into linear orchestration.
-
-## Triggers
-
-- Trigger phrases: "trace this workflow", "trace the call tree", "flatten this call chain", "too many function hops", "untangle nested functions", "map the workflow", "trace this function"
 
 ## Operational Modes
 
@@ -48,14 +44,13 @@ Use when understanding or debugging existing multi-step workflows across files o
    - Highlight which function performs database writes, disk I/O, or network requests.
    - Flag any mutations to shared outer-scope or module-level variables.
 
+**Done when:** every custom function in the chain appears exactly once in the tree, and every hop has a Timeline entry.
+
 ### Mode 2: Flatten (Linear Orchestration Refactoring)
 
-Use when refactoring deep delegation chains to reduce cognitive stack depth:
+Use when refactoring deep delegation chains to reduce cognitive stack depth. Apply the AST Hygiene standard from `rules/AGENTS.md` (inline passthrough wrappers, flat sequential pipelines over internal delegation):
 
-1. **Inline Single-Use Passthrough Wrappers:**
-   Locate intermediate functions that do nothing except forward arguments down another layer. Inline them into the caller.
-
-2. **Invert Delegation to Top-Level Orchestration:**
+1. **Invert Delegation to Top-Level Orchestration:**
    Transform nested delegation (A calls B, which calls C, which calls D) into linear orchestration where coordinator A sequentially invokes independent units:
    - **Before (Nested Delegation):**
      ```typescript
@@ -74,15 +69,16 @@ Use when refactoring deep delegation chains to reduce cognitive stack depth:
      }
      ```
 
-3. **Surface Implicit State:**
+2. **Surface Implicit State:**
    Convert closure-captured or implicit outer variables into explicit function arguments and return types.
 
-4. **Verify Contracts & Error Propagation:**
+3. **Verify Contracts & Error Propagation:**
    Ensure error handling, return value shapes, and asynchronous control flows remain identical to the original behavior.
+
+**Done when:** no non-recursive hop in the chain is more than 2 calls deep, and step 3's contract check passes.
 
 ## Rules
 
-- Strictly no emojis in diagrams, trees, explanations, or code comments.
 - Keep the visualization strictly on a single plane; the reader should never have to mentally hold multiple function contexts simultaneously.
 - Always distinguish between pure data transformations and functions with side effects.
 - In flattening refactors, preserve complete error handling and transactional integrity.

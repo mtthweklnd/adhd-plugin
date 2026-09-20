@@ -14,12 +14,6 @@ description: >-
 
 Break down ambiguous features or Azure DevOps work items into an actionable, single living document in `_dev/`. Protects working memory by establishing a sequential Task List, explicit Acceptance Criteria, and a dedicated Roadmap for deferred thoughts.
 
-## Triggers
-
-- Slash commands: `/micro-plan`, `/plan`
-- Trigger phrases: "break this down", "create a plan", "plan this task", "start work on AB#<id>"
-- Pasted Azure DevOps work item cards, titles, or descriptions
-
 ## Workflow Steps
 
 1. **Sniff Branch & Work Item Context:**
@@ -84,9 +78,3 @@ Use this format when generating or updating `_dev/<id>-<slug>.md`:
 
 - <Deferred idea or future enhancement that should not distract current work>
 ```
-
-## Rules
-
-- Strictly no emojis in plan documents, summaries, or generated code.
-- Always maintain a single living document. Never fragment planning into secondary documents.
-- When an Azure DevOps work item ID is active, prepend `AB#<id>:` to suggested commit messages.

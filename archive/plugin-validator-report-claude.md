@@ -1,3 +1,5 @@
+> **Archived — superseded.** Pre-consolidation critique of the old `adhd-focus-claude/` subfolder, which no longer exists. `hooks/hooks.json` and `scripts/session-briefing.ps1` were rewritten to address every Critical Issue listed here — including the `rules/AGENTS.md` auto-load question (resolved: the script reads and injects it manually via the `SessionStart` hook; see step 7 of `session-briefing.ps1`). Kept for history only.
+
 # Plugin Validation Report
 
 ## Plugin: adhd-focus (folder: `adhd-focus-claude`)
