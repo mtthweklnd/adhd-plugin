@@ -25,13 +25,13 @@ De-densify complex logic and eliminate nested control flow to minimize working m
    If the request was explanation-only ("explain this code") with no ask to change it, stop here — do not propose a refactor.
 
 2. **Cognitive Audit:**
-   Beyond the AST Hygiene standard in `rules/AGENTS.md` (2-level nesting cap, guard clauses), check for working memory friction the standard doesn't cover:
+   Beyond the AST Hygiene standard in `rules/AGENTS.md` (2-level nesting cap, guard clauses — read the file if it isn't already in context, e.g. running as a subagent that skipped the session-start briefing), check for working memory friction the standard doesn't cover:
    - Dense or chained ternary expressions.
    - Cryptic single-letter or abbreviated variable names.
    - Mixed responsibilities (e.g., validation, business calculation, and response formatting intertwined in one block).
 
 3. **Behavior-Preserving Refactor:**
-   Apply the AST Hygiene standard from `rules/AGENTS.md`, plus:
+   Apply the AST Hygiene standard from `rules/AGENTS.md` (read the file first if it isn't already in context), plus:
    - **Extract Helper Units:** Break blocks exceeding 30 lines or containing separate concerns into dedicated single-purpose functions with explicit input/output parameters.
    - **Domain Naming:** Replace cryptic identifiers with descriptive domain nouns and verbs.
    - **Unpack Dense Expressions:** Expand compound ternaries into explicit conditional branches or lookup dictionaries/maps.

@@ -48,7 +48,7 @@ Use when understanding or debugging existing multi-step workflows across files o
 
 ### Mode 2: Flatten (Linear Orchestration Refactoring)
 
-Use when refactoring deep delegation chains to reduce cognitive stack depth. Apply the AST Hygiene standard from `rules/AGENTS.md` (inline passthrough wrappers, flat sequential pipelines over internal delegation):
+Use when refactoring deep delegation chains to reduce cognitive stack depth. Apply the AST Hygiene standard from `rules/AGENTS.md` (inline passthrough wrappers, flat sequential pipelines over internal delegation — read the file first if it isn't already in context, e.g. running as a subagent that skipped the session-start briefing):
 
 1. **Invert Delegation to Top-Level Orchestration:**
    Transform nested delegation (A calls B, which calls C, which calls D) into linear orchestration where coordinator A sequentially invokes independent units:
